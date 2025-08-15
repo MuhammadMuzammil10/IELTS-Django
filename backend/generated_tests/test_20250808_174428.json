@@ -1,0 +1,136 @@
+{
+    "title": "The Impact of Climate Change on Marine Ecosystems",
+    "passage": "Climate change is one of the most pressing global issues of our time, with far-reaching consequences for ecosystems across the planet. Marine ecosystems, in particular, are facing significant challenges as a result of rising temperatures and changing ocean chemistry. The impact of climate change on marine life is a complex and multifaceted issue that requires urgent attention and action.\n\nOne of the key consequences of climate change on marine ecosystems is coral bleaching. Coral reefs, often referred to as the rainforests of the sea, are highly sensitive to changes in water temperature. When sea temperatures rise, corals expel the algae living in their tissues, causing them to turn white or 'bleach.' This process weakens the corals and makes them more susceptible to disease, ultimately leading to widespread coral reef degradation.\n\nIn addition to coral bleaching, ocean acidification is another significant threat to marine ecosystems. As carbon dioxide levels in the atmosphere increase, the oceans absorb a large portion of this greenhouse gas, leading to a decrease in pH levels and increased acidity in the water. This acidification has profound effects on marine organisms, particularly those that rely on calcium carbonate to build their shells and skeletons, such as shellfish and corals. With more acidic waters, these organisms struggle to maintain their structures, which can have cascading effects throughout the food web.\n\nFurthermore, changes in ocean circulation patterns due to climate change can alter nutrient availability in marine ecosystems. Shifts in currents and upwelling events can disrupt the distribution of nutrients, affecting primary productivity and the abundance of marine species. This can have implications for fisheries, as changes in nutrient availability can impact the health and abundance of fish populations, leading to economic repercussions for coastal communities that rely on fishing for their livelihoods.\n\nThe warming of the oceans also poses a threat to marine biodiversity, as many species have specific temperature requirements for survival and reproduction. As water temperatures increase, some species may be forced to migrate to cooler regions or face local extinction if suitable habitats are not available. This disruption in species distributions can have far-reaching ecological consequences, impacting the structure and functioning of marine ecosystems.\n\nAddressing the challenges posed by climate change to marine ecosystems requires a coordinated and interdisciplinary approach. Scientists, policymakers, and stakeholders must work together to develop strategies for mitigating the impacts of climate change, protecting vulnerable marine species, and promoting sustainable ocean management practices. By taking action now, we can help safeguard the health and resilience of marine ecosystems for future generations.",
+    "questions": [
+        {
+            "id": 1,
+            "question": "Which of the following is a consequence of climate change on marine ecosystems?",
+            "type": "matching",
+            "choices": ["Coral Bleaching", "Deforestation", "Air Pollution", "Urbanization"],
+            "answer": "Coral Bleaching"
+        },
+        {
+            "id": 2,
+            "question": "True/False/Not Given: Coral reefs are not affected by changes in water temperature.",
+            "type": "true_false",
+            "choices": ["True", "False", "Not Given"],
+            "answer": "False"
+        },
+        {
+            "id": 3,
+            "question": "Fill in the blank: Ocean acidification results in increased ____ in the water.",
+            "type": "fill_blank",
+            "answer": "acidity"
+        },
+        {
+            "id": 4,
+            "question": "What is one of the consequences of ocean acidification on marine organisms?",
+            "type": "short_answer",
+            "answer": "weakened structures"
+        },
+        {
+            "id": 5,
+            "question": "Which factor can disrupt the distribution of nutrients in marine ecosystems?",
+            "type": "matching",
+            "choices": ["Ocean Acidification", "Changes in Currents", "Deforestation", "Air Pollution"],
+            "answer": "Changes in Currents"
+        },
+        {
+            "id": 6,
+            "question": "True/False/Not Given: Changes in nutrient availability do not impact fish populations.",
+            "type": "true_false",
+            "choices": ["True", "False", "Not Given"],
+            "answer": "False"
+        },
+        {
+            "id": 7,
+            "question": "Fill in the blank: The warming of the oceans can lead to the ____ of marine species.",
+            "type": "fill_blank",
+            "answer": "migration"
+        },
+        {
+            "id": 8,
+            "question": "What is one of the key approaches needed to address climate change impacts on marine ecosystems?",
+            "type": "short_answer",
+            "answer": "interdisciplinary approach"
+        },
+        {
+            "id": 9,
+            "question": "Matching: Match the following - \nA. Coral Bleaching\nB. Ocean Acidification\nC. Changes in Currents\nD. Warming of Oceans\n1. Weakens corals\n2. Increases acidity\n3. Disrupts nutrient distribution\n4. Forces species migration",
+            "type": "matching",
+            "choices": ["1", "2", "3", "4"],
+            "answer": "A1, B2, C3, D4"
+        },
+        {
+            "id": 10,
+            "question": "True/False/Not Given: Addressing climate change impacts on marine ecosystems requires collaboration between stakeholders.",
+            "type": "true_false",
+            "choices": ["True", "False", "Not Given"],
+            "answer": "True"
+        },
+        {
+            "id": 11,
+            "question": "Fill in the blank: Coral reefs are often referred to as the ____ of the sea.",
+            "type": "fill_blank",
+            "answer": "rainforests"
+        },
+        {
+            "id": 12,
+            "question": "What is the main cause of coral bleaching?",
+            "type": "short_answer",
+            "answer": "rising temperatures"
+        },
+        {
+            "id": 13,
+            "question": "Which marine organisms struggle to maintain their structures due to ocean acidification?",
+            "type": "matching",
+            "choices": ["Shellfish", "Corals", "Whales", "Jellyfish"],
+            "answer": "Shellfish"
+        },
+        {
+            "id": 14,
+            "question": "True/False/Not Given: The oceans do not absorb carbon dioxide from the atmosphere.",
+            "type": "true_false",
+            "choices": ["True", "False", "Not Given"],
+            "answer": "False"
+        },
+        {
+            "id": 15,
+            "question": "Fill in the blank: Shifts in ocean circulation patterns can impact ____ availability in marine ecosystems.",
+            "type": "fill_blank",
+            "answer": "nutrient"
+        },
+        {
+            "id": 16,
+            "question": "What can happen to marine biodiversity as a result of warming oceans?",
+            "type": "short_answer",
+            "answer": "disruption in species distributions"
+        },
+        {
+            "id": 17,
+            "question": "Matching: Match the following - \nA. Coral Bleaching\nB. Ocean Acidification\nC. Changes in Currents\nD. Warming of Oceans\n1. Disrupts food web\n2. Impacts calcium carbonate\n3. Alters nutrient distribution\n4. Increases disease susceptibility",
+            "type": "matching",
+            "choices": ["1", "2", "3", "4"],
+            "answer": "A4, B2, C3, D1"
+        },
+        {
+            "id": 18,
+            "question": "True/False/Not Given: Marine species do not need specific temperature requirements for survival.",
+            "type": "true_false",
+            "choices": ["True", "False", "Not Given"],
+            "answer": "False"
+        },
+        {
+            "id": 19,
+            "question": "Fill in the blank: Scientists, policymakers, and stakeholders must work together to develop ____ strategies.",
+            "type": "fill_blank",
+            "answer": "mitigating"
+        },
+        {
+            "id": 20,
+            "question": "What can help safeguard the health and resilience of marine ecosystems?",
+            "type": "short_answer",
+            "answer": "taking action now"
+        }
+    ]
+}

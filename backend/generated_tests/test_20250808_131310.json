@@ -1,0 +1,136 @@
+{
+    "title": "The Impact of Climate Change on Biodiversity",
+    "passage": "Climate change is one of the most pressing global challenges of our time, with far-reaching consequences for ecosystems and biodiversity. The rise in global temperatures, primarily driven by human activities such as burning fossil fuels and deforestation, has led to shifts in weather patterns and a rise in extreme weather events. These changes are disrupting ecosystems around the world and posing a significant threat to the diversity of life on Earth.\n\nOne of the key impacts of climate change on biodiversity is the alteration of habitats. As temperatures increase, many species are forced to migrate to higher latitudes or elevations in search of suitable conditions. This shift in habitat ranges can lead to competition between species, loss of biodiversity hotspots, and ultimately, the extinction of some species. For example, polar bears are facing habitat loss as Arctic ice melts, reducing their hunting grounds and threatening their survival.\n\nAnother consequence of climate change on biodiversity is the disruption of ecological interactions. Many species rely on specific relationships with other species for food, pollination, or protection. Changes in temperature and precipitation can disrupt these interactions, leading to imbalances in ecosystems. For instance, coral reefs depend on a delicate balance between coral polyps and algae for survival. However, rising sea temperatures can cause coral bleaching, disrupting this symbiotic relationship and endangering reef ecosystems.\n\nTo address the impacts of climate change on biodiversity, scientists are conducting research to understand the complex interactions between climate, ecosystems, and species. By studying patterns of species distribution, migration, and adaptation, researchers can identify vulnerable species and prioritize conservation efforts. Conservation strategies may include creating protected areas, restoring habitats, and implementing sustainable practices to mitigate the effects of climate change on biodiversity.\n\nIn a recent study conducted in 2020, researchers analyzed the effects of climate change on bird populations in North America. The study found that rising temperatures were causing shifts in the distribution of bird species, with some moving further north to cooler regions. These changes in bird migration patterns could have cascading effects on ecosystems, affecting food webs and plant pollination. The study highlighted the need for proactive conservation measures to protect bird species from the impacts of climate change.\n\nOverall, the impact of climate change on biodiversity is a complex and multifaceted issue that requires global cooperation and concerted action. By understanding the interconnectedness of ecosystems and the importance of biodiversity for human well-being, we can work towards a sustainable future for all species on Earth.",
+    "questions": [
+        {
+            "id": 1,
+            "question": "Which of the following best describes the main driver of global temperature rise?",
+            "type": "matching",
+            "choices": ["Deforestation", "Burning fossil fuels", "Melting ice caps", "Ocean acidification"],
+            "answer": "Burning fossil fuels"
+        },
+        {
+            "id": 2,
+            "question": "Climate change has caused a loss of biodiversity hotspots.",
+            "type": "true_false",
+            "choices": ["True", "False", "Not Given"],
+            "answer": "True"
+        },
+        {
+            "id": 3,
+            "question": "Fill in the blank: Changes in temperature and precipitation can disrupt ecological _____.",
+            "type": "fill_blank",
+            "answer": "interactions"
+        },
+        {
+            "id": 4,
+            "question": "What year was the study on bird populations in North America conducted?",
+            "type": "short_answer",
+            "answer": "2020"
+        },
+        {
+            "id": 5,
+            "question": "Which of the following is NOT a conservation strategy mentioned in the passage?",
+            "type": "matching",
+            "choices": ["Creating protected areas", "Implementing sustainable practices", "Hunting endangered species", "Restoring habitats"],
+            "answer": "Hunting endangered species"
+        },
+        {
+            "id": 6,
+            "question": "Polar bears are facing habitat loss due to melting ice caps.",
+            "type": "true_false",
+            "choices": ["True", "False", "Not Given"],
+            "answer": "True"
+        },
+        {
+            "id": 7,
+            "question": "Fill in the blank: The study on bird populations highlighted the need for proactive ____ measures.",
+            "type": "fill_blank",
+            "answer": "conservation"
+        },
+        {
+            "id": 8,
+            "question": "What is one of the key impacts of climate change on biodiversity mentioned in the passage?",
+            "type": "short_answer",
+            "answer": "alteration of habitats"
+        },
+        {
+            "id": 9,
+            "question": "Which of the following ecosystems is mentioned as being affected by rising sea temperatures?",
+            "type": "matching",
+            "choices": ["Rainforests", "Coral reefs", "Tundras", "Deserts"],
+            "answer": "Coral reefs"
+        },
+        {
+            "id": 10,
+            "question": "The study on bird populations found that bird migration patterns remained unchanged.",
+            "type": "true_false",
+            "choices": ["True", "False", "Not Given"],
+            "answer": "False"
+        },
+        {
+            "id": 11,
+            "question": "Which of the following is NOT a consequence of climate change on biodiversity mentioned in the passage?",
+            "type": "matching",
+            "choices": ["Disruption of ecological interactions", "Loss of biodiversity hotspots", "Increase in species diversity", "Migration of species"],
+            "answer": "Increase in species diversity"
+        },
+        {
+            "id": 12,
+            "question": "Fill in the blank: Coral reefs depend on a delicate balance between coral polyps and _____.",
+            "type": "fill_blank",
+            "answer": "algae"
+        },
+        {
+            "id": 13,
+            "question": "What is the primary cause of habitat loss for polar bears?",
+            "type": "short_answer",
+            "answer": "Arctic ice melts"
+        },
+        {
+            "id": 14,
+            "question": "The study on bird populations emphasized the need for reactive conservation measures.",
+            "type": "true_false",
+            "choices": ["True", "False", "Not Given"],
+            "answer": "False"
+        },
+        {
+            "id": 15,
+            "question": "Fill in the blank: Researchers are studying patterns of species distribution, migration, and adaptation to identify vulnerable _____.",
+            "type": "fill_blank",
+            "answer": "species"
+        },
+        {
+            "id": 16,
+            "question": "What kind of measures are needed to protect bird species from the impacts of climate change?",
+            "type": "short_answer",
+            "answer": "proactive conservation measures"
+        },
+        {
+            "id": 17,
+            "question": "Which of the following is NOT mentioned as a consequence of climate change on biodiversity?",
+            "type": "matching",
+            "choices": ["Disruption of ecological interactions", "Loss of biodiversity hotspots", "Migration of species", "Increase in species diversity"],
+            "answer": "Increase in species diversity"
+        },
+        {
+            "id": 18,
+            "question": "Fill in the blank: Rising sea temperatures can cause coral _____.",
+            "type": "fill_blank",
+            "answer": "bleaching"
+        },
+        {
+            "id": 19,
+            "question": "The study on bird populations focused on the impacts of climate change on amphibians.",
+            "type": "true_false",
+            "choices": ["True", "False", "Not Given"],
+            "answer": "False"
+        },
+        {
+            "id": 20,
+            "question": "What is the importance of understanding the interconnectedness of ecosystems and biodiversity?",
+            "type": "short_answer",
+            "answer": "work towards a sustainable future"
+        }
+    ]
+}
