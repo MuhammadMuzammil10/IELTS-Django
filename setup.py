@@ -83,16 +83,16 @@ OPENAI_API_KEY=your-openai-api-key-here
         print(f"❌ Failed to install Django: {stderr}")
         return False
     
-    # success, stdout, stderr = run_command(f"{pip_cmd} run python manage.py makemigrations", cwd="backend")
-    # if not success:
-    #     print(f"❌ Failed to create migrations: {stderr}")
-    #     return False
+    success, stdout, stderr = run_command(f"{pip_cmd} run python manage.py makemigrations", cwd="backend")
+    if not success:
+        print(f"❌ Failed to create migrations: {stderr}")
+        return False
     
-    # success, stdout, stderr = run_command(f"{pip_cmd} run python manage.py migrate", cwd="backend")
-    # if not success:
-    #     print(f"❌ Failed to run migrations: {stderr}")
-    #     return False
-    # print("✅ Database migrations completed")
+    success, stdout, stderr = run_command(f"{pip_cmd} run python manage.py migrate", cwd="backend")
+    if not success:
+        print(f"❌ Failed to run migrations: {stderr}")
+        return False
+    print("✅ Database migrations completed")
     
     return True
 
@@ -148,8 +148,8 @@ def main():
         return False
     
     # Set up backend
-    # if not setup_backend():
-    #     return False
+    if not setup_backend():
+        return False
     
     # Set up frontend
     if not setup_frontend():
