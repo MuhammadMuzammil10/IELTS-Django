@@ -15,6 +15,10 @@ import ListeningTestList from './pages/ListeningTestList';
 import ListeningTest from './pages/ListeningTest';
 import ListeningResults from './pages/ListeningResults';
 import ListeningResultDetail from './pages/ListeningResultDetail';
+import WritingTestList from './pages/WritingTestList';
+import WritingTest from './pages/WritingTest';
+import WritingResults from './pages/WritingResults';
+import WritingResultDetail from './pages/WritingResultDetail';
 
 function PrivateRoute({ children }) {
   const { user } = useAuth();
@@ -107,6 +111,38 @@ function App() {
               element={
                 <PrivateRoute>
                   <ListeningResultDetail />
+                </PrivateRoute>
+              } 
+            />
+            <Route 
+              path="/writing-tests" 
+              element={
+                <PrivateRoute>
+                  <WritingTestList />
+                </PrivateRoute>
+              } 
+            />
+            <Route 
+              path="/writing-tests/:testId" 
+              element={
+                <PrivateRoute>
+                  <WritingTest />
+                </PrivateRoute>
+              } 
+            />
+            <Route 
+              path="/writing-results" 
+              element={
+                <PrivateRoute>
+                  <WritingResults />
+                </PrivateRoute>
+              } 
+            />
+            <Route 
+              path="/writing-results/:resultId" 
+              element={
+                <PrivateRoute>
+                  <WritingResultDetail />
                 </PrivateRoute>
               } 
             />

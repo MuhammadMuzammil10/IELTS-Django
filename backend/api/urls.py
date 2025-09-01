@@ -4,7 +4,9 @@ from .views import (
     RegisterView, UserProfileView, ReadingTestListView, ReadingTestDetailView,
     TestSubmissionView, TestResultListView, TestResultDetailView, GenerateTestView, user_stats,
     ListeningTestListView, ListeningTestDetailView, ListeningTestSubmissionView,
-    ListeningTestResultListView, ListeningTestResultDetailView, GenerateListeningTestView
+    ListeningTestResultListView, ListeningTestResultDetailView, GenerateListeningTestView,
+    WritingTestListView, WritingTestDetailView, WritingTestSubmissionView,
+    WritingTestResultListView, WritingTestResultDetailView, GenerateWritingTestView
 )
 
 urlpatterns = [
@@ -34,9 +36,19 @@ urlpatterns = [
     path('listening-results/', ListeningTestResultListView.as_view(), name='listening-result-list'),
     path('listening-results/<int:pk>/', ListeningTestResultDetailView.as_view(), name='listening-result-detail'),
     
+    # Writing Tests
+    path('writing-tests/', WritingTestListView.as_view(), name='writing-test-list'),
+    path('writing-tests/<int:pk>/', WritingTestDetailView.as_view(), name='writing-test-detail'),
+    path('writing-tests/<int:test_id>/submit/', WritingTestSubmissionView.as_view(), name='writing-test-submit'),
+    
+    # Writing Results
+    path('writing-results/', WritingTestResultListView.as_view(), name='writing-result-list'),
+    path('writing-results/<int:pk>/', WritingTestResultDetailView.as_view(), name='writing-result-detail'),
+    
     # Admin
     path('generate-test/', GenerateTestView.as_view(), name='generate-test'),
     path('generate-listening-test/', GenerateListeningTestView.as_view(), name='generate-listening-test'),
+    path('writing-tests/generate/', GenerateWritingTestView.as_view(), name='generate-writing-test'),
     
     # Statistics
     path('stats/', user_stats, name='user-stats'),

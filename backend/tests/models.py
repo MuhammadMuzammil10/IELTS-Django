@@ -209,4 +209,84 @@ class ListeningUserResult(models.Model):
 
     class Meta:
         db_table = 'listening_user_results'
-        ordering = ['-completed_at'] 
+        ordering = ['-completed_at']
+
+
+# Writing Module Models
+class WritingTest(models.Model):
+    title = models.CharField(max_length=200, default="IELTS Writing Test")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    difficulty_level = models.CharField(max_length=20, choices=[
+        ('easy', 'Easy'),
+        ('medium', 'Medium'),
+        ('hard', 'Hard'),
+    ], default='medium')
+    
+    # Task 1 data
+    task1_image = models.TextField(blank=True, null=True)  # Base64 or URL
+    task1_image_description = models.TextField(blank=True, null=True)
+    task1_type = models.CharField(max_length=50, choices=[
+        ('graph', 'Graph'),
+        ('chart', 'Chart'),
+        ('table', 'Table'),
+        ('diagram', 'Diagram'),
+        ('map', 'Map'),
+    ], default='graph')
+    
+    # Task 2 data
+    task2_essay_prompt = models.TextField()
+    task2_type = models.CharField(max_length=50, choices=[
+        ('opinion', 'Opinion-based'),
+        ('problem_solution', 'Problem-Solution'),
+        ('discussion', 'Discussion'),
+        ('advantage_disadvantage', 'Advantage-Disadvantage'),
+    ], default='opinion')
+    
+    # Time limits
+    task1_time_limit = models.PositiveIntegerField(default=20)  # minutes
+    task2_time_limit = models.PositiveIntegerField(default=40)  # minutes
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        db_table = 'writing_tests'
+        ordering = ['-created_at']
+
+
+class WritingTestSubmission(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='writing_submissions')
+    test = models.ForeignKey(WritingTest, on_delete=models.CASCADE, related_name='submissions')
+    
+    # User's answers
+    task1_answer = models.TextField()
+    task2_answer = models.TextField()
+    
+    # AI Evaluation results
+    task1_score = models.DecimalField(max_digits=3, decimal_places=1, null=True, blank=True)
+    task1_feedback = models.TextField(blank=True, null=True)
+    task2_score = models.DecimalField(max_digits=3, decimal_places=1, null=True, blank=True)
+    task2_feedback = models.TextField(blank=True, null=True)
+    overall_band_score = models.DecimalField(max_digits=3, decimal_places=1, null=True, blank=True)
+    
+    # Detailed evaluation criteria
+    task1_criteria = models.JSONField(null=True, blank=True)  # Store detailed criteria scores
+    task2_criteria = models.JSONField(null=True, blank=True)  # Store detailed criteria scores
+    
+    # Timestamps
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    evaluated_at = models.DateTimeField(null=True, blank=True)
+    
+    # Time tracking
+    task1_time_taken = models.DurationField(null=True, blank=True)
+    task2_time_taken = models.DurationField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.user.email} - {self.test.title} - {self.overall_band_score}"
+
+    class Meta:
+        db_table = 'writing_test_submissions'
+        ordering = ['-submitted_at'] 

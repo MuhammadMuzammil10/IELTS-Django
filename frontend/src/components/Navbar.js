@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { FiMenu, FiX, FiUser, FiLogOut, FiHome, FiBook, FiBarChart, FiSettings, FiHeadphones } from 'react-icons/fi';
+import { FiMenu, FiX, FiUser, FiLogOut, FiHome, FiBook, FiBarChart, FiSettings, FiHeadphones, FiEdit3 } from 'react-icons/fi';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -17,8 +17,10 @@ const Navbar = () => {
     { name: 'Dashboard', path: '/dashboard', icon: FiHome },
     { name: 'Reading Tests', path: '/tests', icon: FiBook },
     { name: 'Listening Tests', path: '/listening-tests', icon: FiHeadphones },
+    { name: 'Writing Tests', path: '/writing-tests', icon: FiEdit3 },
     { name: 'Reading Results', path: '/results', icon: FiBarChart },
     { name: 'Listening Results', path: '/listening-results', icon: FiBarChart },
+    { name: 'Writing Results', path: '/writing-results', icon: FiBarChart },
     ...(user.is_staff ? [{ name: 'Admin', path: '/admin', icon: FiSettings }] : [])
   ] : [];
 
@@ -28,10 +30,18 @@ const Navbar = () => {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0 flex items-center">
-              <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
+              {/* <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-lg">I</span>
               </div>
-              <span className="ml-2 text-xl font-bold text-gray-900">IELTS Prep</span>
+              <span className="ml-2 text-xl font-bold text-gray-900">IELTS Prep</span> */}
+            </Link>
+            <Link to="/" className="flex-shrink-0 flex items-center">
+              <img
+                src={require('../assets/gpt_logo_landscape.png')}
+                alt="IELTS Prep Logo"
+                className="w-22 h-14 rounded-lg"
+              />
+              {/* <span className="ml-2 text-xl font-bold text-gray-900">IELTS Prep</span> */}
             </Link>
           </div>
 

@@ -6,16 +6,18 @@ from django.core.files.base import ContentFile
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.db import transaction, models
-import openai, json, os, re
-from elevenlabs import ElevenLabs
+import openai, json, os, re, requests, time
+# from elevenlabs import ElevenLabs
 from django.conf import settings
 from openai import OpenAI
-from tests.models import ReadingTest, Question, TestResult, ListeningTest, ListeningSection, ListeningQuestion, ListeningUserResult
+from tests.models import ReadingTest, Question, TestResult, ListeningTest, ListeningSection, ListeningQuestion, ListeningUserResult, WritingTest, WritingTestSubmission
 from .serializers import (
     ReadingTestSerializer, ReadingTestListSerializer, TestSubmissionSerializer,
     TestResultSerializer, TestResultDetailSerializer,
     ListeningTestSerializer, ListeningTestListSerializer, ListeningTestSubmissionSerializer,
-    ListeningTestResultSerializer, ListeningTestResultDetailSerializer, GenerateListeningTestSerializer
+    ListeningTestResultSerializer, ListeningTestResultDetailSerializer, GenerateListeningTestSerializer,
+    WritingTestSerializer, WritingTestListSerializer, WritingTestSubmissionSerializer,
+    WritingTestResultSerializer, WritingTestResultDetailSerializer, GenerateWritingTestSerializer
 )
 from users.serializers import UserRegistrationSerializer, UserProfileSerializer
 
@@ -256,12 +258,19 @@ def user_stats(request):
     listening_count = listening_results.count()
     listening_avg_score = listening_results.aggregate(avg_score=models.Avg('score'))['avg_score'] or 0
     
+    # Writing test stats
+    writing_results = WritingTestSubmission.objects.filter(user=user)
+    writing_count = writing_results.count()
+    writing_avg_score = writing_results.aggregate(avg_score=models.Avg('overall_band_score'))['avg_score'] or 0
+    
     return Response({
         'reading_tests_taken': reading_count,
         'reading_avg_score': round(reading_avg_score, 1),
         'listening_tests_taken': listening_count,
         'listening_avg_score': round(listening_avg_score, 1),
-        'total_tests_taken': reading_count + listening_count
+        'writing_tests_taken': writing_count,
+        'writing_avg_score': round(writing_avg_score, 1),
+        'total_tests_taken': reading_count + listening_count + writing_count
     })
 
 
@@ -646,3 +655,346 @@ class GenerateListeningTestView(APIView):
             return Response({
                 'error': f'Failed to generate listening test: {str(e)}'
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# Writing Module Views
+class WritingTestListView(generics.ListAPIView):
+    serializer_class = WritingTestListSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return WritingTest.objects.filter(is_active=True).order_by('-created_at')
+
+
+class WritingTestDetailView(generics.RetrieveAPIView):
+    serializer_class = WritingTestSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = WritingTest.objects.filter(is_active=True)
+
+
+class WritingTestSubmissionView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, test_id):
+        try:
+            test = WritingTest.objects.get(id=test_id, is_active=True)
+        except WritingTest.DoesNotExist:
+            return Response({'error': 'Writing test not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = WritingTestSubmissionSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        task1_answer = serializer.validated_data['task1_answer']
+        task2_answer = serializer.validated_data['task2_answer']
+        task1_time_taken = serializer.validated_data.get('task1_time_taken')
+        task2_time_taken = serializer.validated_data.get('task2_time_taken')
+
+        # Create submission record
+        with transaction.atomic():
+            submission = WritingTestSubmission.objects.create(
+                user=request.user,
+                test=test,
+                task1_answer=task1_answer,
+                task2_answer=task2_answer,
+                task1_time_taken=task1_time_taken,
+                task2_time_taken=task2_time_taken
+            )
+
+        # Evaluate using OpenAI
+        try:
+            evaluation_result = self.evaluate_writing_with_openai(
+                task1_answer, task2_answer, 
+                test.task1_image_description, test.task2_essay_prompt
+            )
+            
+            # Update submission with evaluation results
+            submission.task1_score = evaluation_result['task1']['score']
+            submission.task1_feedback = evaluation_result['task1']['feedback']
+            submission.task2_score = evaluation_result['task2']['score']
+            submission.task2_feedback = evaluation_result['task2']['feedback']
+            submission.overall_band_score = evaluation_result['overall_band_score']
+            submission.task1_criteria = evaluation_result.get('task1_criteria', {})
+            submission.task2_criteria = evaluation_result.get('task2_criteria', {})
+            submission.evaluated_at = timezone.now()
+            submission.save()
+
+            return Response({
+                'message': 'Writing test submitted and evaluated successfully',
+                'submission_id': submission.id,
+                'evaluation': evaluation_result
+            }, status=status.HTTP_201_CREATED)
+
+        except Exception as e:
+            return Response({
+                'error': f'Failed to evaluate writing: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def evaluate_writing_with_openai(self, task1_answer, task2_answer, task1_description, task2_prompt):
+        """Evaluate writing using OpenAI as IELTS examiner"""
+        client = OpenAI(api_key=settings.OPENAI_API_KEY)
+        
+        evaluation_prompt = f"""
+        You are a certified IELTS examiner. Please evaluate the following writing tasks according to IELTS criteria:
+
+        TASK 1:
+        Original Task Description: {task1_description}
+        Student's Answer: {task1_answer}
+
+        TASK 2:
+        Original Essay Prompt: {task2_prompt}
+        Student's Answer: {task2_answer}
+
+        Please evaluate both tasks based on these IELTS criteria:
+        1. Task Achievement / Task Response (0-9)
+        2. Coherence and Cohesion (0-9)
+        3. Lexical Resource (0-9)
+        4. Grammatical Range and Accuracy (0-9)
+
+        Return your evaluation in this exact JSON format:
+        {{
+            "task1": {{
+                "score": 7.5,
+                "feedback": "Detailed feedback for Task 1..."
+            }},
+            "task2": {{
+                "score": 8.0,
+                "feedback": "Detailed feedback for Task 2..."
+            }},
+            "overall_band_score": 7.5,
+            "task1_criteria": {{
+                "task_achievement": 7.5,
+                "coherence_cohesion": 7.0,
+                "lexical_resource": 8.0,
+                "grammatical_range": 7.5
+            }},
+            "task2_criteria": {{
+                "task_response": 8.0,
+                "coherence_cohesion": 8.0,
+                "lexical_resource": 8.0,
+                "grammatical_range": 8.0
+            }}
+        }}
+        """
+
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a certified IELTS examiner with extensive experience in evaluating writing tasks. Provide detailed, constructive feedback."},
+                {"role": "user", "content": evaluation_prompt}
+            ],
+            response_format={"type": "json_object"},
+            temperature=0.3
+        )
+
+        content = response.choices[0].message.content
+        return json.loads(content)
+
+
+class WritingTestResultListView(generics.ListAPIView):
+    serializer_class = WritingTestResultSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return WritingTestSubmission.objects.filter(user=self.request.user).order_by('-submitted_at')
+
+
+class WritingTestResultDetailView(generics.RetrieveAPIView):
+    serializer_class = WritingTestResultDetailSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return WritingTestSubmission.objects.filter(user=self.request.user)
+
+
+class GenerateWritingTestView(APIView):
+    permission_classes = [permissions.IsAdminUser]
+
+    def post(self, request):
+        try:
+            serializer = GenerateWritingTestSerializer(data=request.data)
+            if not serializer.is_valid():
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+            difficulty_level = serializer.validated_data['difficulty_level']
+            task1_type = serializer.validated_data['task1_type']
+            task2_type = serializer.validated_data['task2_type']
+
+            client = OpenAI(api_key=settings.OPENAI_API_KEY)
+            
+            # Generate writing test content
+            test_data = self.generate_writing_test_with_openai(client, difficulty_level, task1_type, task2_type)
+            
+            # Create test in database
+            with transaction.atomic():
+                test = WritingTest.objects.create(
+                    title=f"IELTS Writing Test - {timezone.now().strftime('%Y-%m-%d %H:%M')}",
+                    difficulty_level=difficulty_level,
+                    created_by=request.user,
+                    task1_image=test_data['task1']['image'],
+                    task1_image_description=test_data['task1']['image_description'],
+                    task1_type=test_data['task1']['type'],
+                    task2_essay_prompt=test_data['task2']['essay_prompt'],
+                    task2_type=test_data['task2']['type']
+                )
+
+            return Response({
+                'success': True,
+                'message': 'Writing test generated successfully',
+                'test_id': test.id,
+                'test': WritingTestSerializer(test).data
+            }, status=status.HTTP_201_CREATED)
+            
+        except Exception as e:
+            print("Error generating writing test:", e)
+            return Response({
+                'error': f'Failed to generate writing test: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def generate_writing_test_with_openai(self, client, difficulty_level, task1_type, task2_type):
+        """Generate writing test using OpenAI"""
+        import random
+        
+        # Randomize task types if 'random' is selected
+        if task1_type == 'random':
+            task1_type = random.choice(['graph', 'chart', 'table', 'diagram', 'map'])
+        if task2_type == 'random':
+            task2_type = random.choice(['opinion', 'problem_solution', 'discussion', 'advantage_disadvantage'])
+
+        # Generate Task 1 content
+        task1_prompt = f"""
+        Generate an IELTS Writing Task 1 {task1_type} for {difficulty_level} difficulty level.
+        
+        Create a detailed description of a {task1_type} that would be suitable for IELTS Writing Task 1.
+        The description should include:
+        - Clear data points, trends, or processes
+        - Specific numbers, percentages, or categories
+        - Time periods or comparisons
+        - Sufficient detail for a 150-word response
+        
+        Return in this JSON format:
+        {{
+            "type": "{task1_type}",
+            "image_description": "Detailed description of the {task1_type} with specific data points, trends, and comparisons that a student would need to describe in 150 words."
+        }}
+        """
+
+        task1_response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are an IELTS test content expert. Generate realistic writing task descriptions."},
+                {"role": "user", "content": task1_prompt}
+            ],
+            response_format={"type": "json_object"},
+            temperature=0.7
+        )
+
+        task1_data = json.loads(task1_response.choices[0].message.content)
+
+        # Generate Task 2 content
+        task2_prompt = f"""
+        Generate an IELTS Writing Task 2 {task2_type} essay prompt for {difficulty_level} difficulty level.
+        
+        Create an essay question that requires the student to:
+        - Write at least 250 words
+        - Address the specific task type: {task2_type}
+        - Present clear arguments and examples
+        - Use appropriate academic language
+        
+        Return in this JSON format:
+        {{
+            "type": "{task2_type}",
+            "essay_prompt": "The complete essay question/prompt that students need to respond to."
+        }}
+        """
+
+        task2_response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are an IELTS test content expert. Generate realistic essay prompts."},
+                {"role": "user", "content": task2_prompt}
+            ],
+            response_format={"type": "json_object"},
+            temperature=0.7
+        )
+
+        task2_data = json.loads(task2_response.choices[0].message.content)
+
+        # Generate image using DALL-E
+        image_prompt = f"Create a professional IELTS-style {task1_type} showing {task1_data['image_description'][:100]}..."
+        # # for openai image
+        # try:
+        #     image_response = client.images.generate(
+        #         model="dall-e-3",
+        #         prompt=image_prompt,
+        #         size="1024x1024",
+        #         quality="standard",
+        #         n=1
+        #     )
+        #     image_url = image_response.data[0].url
+        # except Exception as e:
+        #     print(f"Error generating image: {e}")
+        #     # Fallback to a placeholder or base64 encoded simple chart
+        #     image_url = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+CiAgPHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzMzMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkNoYXJ0IFBsYWNlaG9sZGVyPC90ZXh0Pgo8L3N2Zz4K"
+        
+        import requests, time
+
+        try:
+            # Step 1: Submit generation task
+            url = "https://api.kie.ai/api/v1/gpt4o-image/generate"
+            headers = {
+                "Authorization": "Bearer 377f0ece01c2e813c49b8a4f77b61221",
+                "Content-Type": "application/json"
+            }
+            payload = {
+                "prompt": image_prompt,
+                "size": "1:1",
+                "nVariants": 1
+            }
+
+            response = requests.post(url, json=payload, headers=headers)
+            response.raise_for_status()
+            data = response.json()
+            print("Generation Response:", data)
+
+            task_id = data["data"]["taskId"]
+
+            # Step 2: Poll until image ready
+            status_url = f"https://api.kie.ai/api/v1/gpt4o-image/record-info?taskId={task_id}"
+            image_url = None
+
+            for _ in range(20):  # max 10 tries
+                status_resp = requests.get(status_url, headers={"Authorization": "Bearer 377f0ece01c2e813c49b8a4f77b61221"})
+                status_data = status_resp.json()
+                print("Status Response:", status_data)
+
+                task_data = status_data.get("data", {})
+                if task_data.get("successFlag") == 1:  # Success
+                    result_urls = task_data["response"]["resultUrls"]
+                    if result_urls:
+                        image_url = result_urls[0]
+                    break
+                elif task_data.get("successFlag") == 2:  # Failed
+                    raise Exception(f"Generation failed: {task_data.get('errorMessage')}")
+                else:
+                    time.sleep(5)  # wait before retrying
+
+            if not image_url:
+                raise Exception("Image not generated in time")
+
+        except Exception as e:
+            print(f"Error generating image: {e}")
+            image_url = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+CiAgPHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzMzMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkNoYXJ0IFBsYWNlaG9sZGVyPC90ZXh0Pgo8L3N2Zz4K"
+
+
+        return {
+            'task1': {
+                'type': task1_data['type'],
+                'image': image_url,
+                'image_description': task1_data['image_description']
+            },
+            'task2': {
+                'type': task2_data['type'],
+                'essay_prompt': task2_data['essay_prompt']
+            }
+        }

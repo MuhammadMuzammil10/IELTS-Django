@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
-import { FiBook, FiBarChart, FiTarget, FiTrendingUp, FiClock, FiCheckCircle, FiHeadphones } from 'react-icons/fi';
+import { FiBook, FiBarChart, FiTarget, FiTrendingUp, FiClock, FiCheckCircle, FiHeadphones, FiEdit3 } from 'react-icons/fi';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -106,7 +106,7 @@ const Dashboard = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white rounded-lg shadow-md p-6">
           <div className="flex items-center mb-4">
             <FiBook className="text-2xl text-primary-600 mr-3" />
@@ -160,10 +160,37 @@ const Dashboard = () => {
             <FiHeadphones className="ml-2" />
           </Link>
         </div>
+
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="flex items-center mb-4">
+            <FiEdit3 className="text-2xl text-purple-600 mr-3" />
+            <h2 className="text-xl font-semibold text-gray-900">Writing Tests</h2>
+          </div>
+          <p className="text-gray-600 mb-4">
+            Practice your writing skills with Task 1 (graphs/charts) and Task 2 (essays) with AI evaluation.
+          </p>
+          <div className="space-y-3">
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">Tests Taken:</span>
+              <span className="font-medium">{stats?.writing_tests_taken || 0}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">Average Score:</span>
+              <span className="font-medium">{stats?.writing_avg_score || 0}</span>
+            </div>
+          </div>
+          <Link
+            to="/writing-tests"
+            className="mt-4 inline-flex items-center px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-md hover:bg-purple-700 transition-colors duration-200"
+          >
+            Start Writing Test
+            <FiEdit3 className="ml-2" />
+          </Link>
+        </div>
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
         <div className="bg-white rounded-lg shadow-md p-6">
           <div className="flex items-center">
             <FiTarget className="text-2xl text-primary-600 mr-3" />
@@ -196,11 +223,23 @@ const Dashboard = () => {
 
         <div className="bg-white rounded-lg shadow-md p-6">
           <div className="flex items-center">
-            <FiCheckCircle className="text-2xl text-purple-600 mr-3" />
+            <FiEdit3 className="text-2xl text-purple-600 mr-3" />
+            <div>
+              <p className="text-sm text-gray-600">Writing Avg</p>
+              <p className="text-2xl font-bold text-gray-900">{stats?.writing_avg_score || 0}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="flex items-center">
+            <FiCheckCircle className="text-2xl text-indigo-600 mr-3" />
             <div>
               <p className="text-sm text-gray-600">Overall Avg</p>
               <p className="text-2xl font-bold text-gray-900">
-                {stats?.reading_avg_score && stats?.listening_avg_score 
+                {stats?.reading_avg_score && stats?.listening_avg_score && stats?.writing_avg_score
+                  ? ((stats.reading_avg_score + stats.listening_avg_score + stats.writing_avg_score) / 3).toFixed(1)
+                  : stats?.reading_avg_score && stats?.listening_avg_score
                   ? ((stats.reading_avg_score + stats.listening_avg_score) / 2).toFixed(1)
                   : 0}
               </p>

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from tests.models import ReadingTest, Question, TestResult, ListeningTest, ListeningSection, ListeningQuestion, ListeningUserResult
+from tests.models import ReadingTest, Question, TestResult, ListeningTest, ListeningSection, ListeningQuestion, ListeningUserResult, WritingTest, WritingTestSubmission
 from users.serializers import UserProfileSerializer
 
 
@@ -225,4 +225,70 @@ class ListeningTestResultDetailSerializer(serializers.ModelSerializer):
 
 class GenerateListeningTestSerializer(serializers.Serializer):
     difficulty_level = serializers.ChoiceField(choices=[('easy', 'Easy'), ('medium', 'Medium'), ('hard', 'Hard')], default='medium')
-    include_audio = serializers.BooleanField(default=True) 
+    include_audio = serializers.BooleanField(default=True)
+
+
+# Writing Module Serializers
+class WritingTestSerializer(serializers.ModelSerializer):
+    created_by = UserProfileSerializer(read_only=True)
+
+    class Meta:
+        model = WritingTest
+        fields = ['id', 'title', 'difficulty_level', 'is_active', 'created_at', 'created_by',
+                  'task1_image', 'task1_image_description', 'task1_type',
+                  'task2_essay_prompt', 'task2_type', 'task1_time_limit', 'task2_time_limit']
+
+
+class WritingTestListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WritingTest
+        fields = ['id', 'title', 'difficulty_level', 'is_active', 'created_at', 
+                  'task1_type', 'task2_type', 'task1_time_limit', 'task2_time_limit']
+
+
+class WritingTestSubmissionSerializer(serializers.Serializer):
+    task1_answer = serializers.CharField()
+    task2_answer = serializers.CharField()
+    task1_time_taken = serializers.DurationField(required=False)
+    task2_time_taken = serializers.DurationField(required=False)
+
+
+class WritingTestResultSerializer(serializers.ModelSerializer):
+    test = WritingTestListSerializer(read_only=True)
+    user = UserProfileSerializer(read_only=True)
+
+    class Meta:
+        model = WritingTestSubmission
+        fields = ['id', 'test', 'user', 'task1_score', 'task2_score', 'overall_band_score',
+                  'submitted_at', 'evaluated_at', 'task1_time_taken', 'task2_time_taken']
+
+
+class WritingTestResultDetailSerializer(serializers.ModelSerializer):
+    test = WritingTestSerializer(read_only=True)
+    user = UserProfileSerializer(read_only=True)
+
+    class Meta:
+        model = WritingTestSubmission
+        fields = ['id', 'test', 'user', 'task1_answer', 'task2_answer',
+                  'task1_score', 'task1_feedback', 'task2_score', 'task2_feedback',
+                  'overall_band_score', 'task1_criteria', 'task2_criteria',
+                  'submitted_at', 'evaluated_at', 'task1_time_taken', 'task2_time_taken']
+
+
+class GenerateWritingTestSerializer(serializers.Serializer):
+    difficulty_level = serializers.ChoiceField(choices=[('easy', 'Easy'), ('medium', 'Medium'), ('hard', 'Hard')], default='medium')
+    task1_type = serializers.ChoiceField(choices=[
+        ('graph', 'Graph'),
+        ('chart', 'Chart'),
+        ('table', 'Table'),
+        ('diagram', 'Diagram'),
+        ('map', 'Map'),
+        ('random', 'Random')
+    ], default='random')
+    task2_type = serializers.ChoiceField(choices=[
+        ('opinion', 'Opinion-based'),
+        ('problem_solution', 'Problem-Solution'),
+        ('discussion', 'Discussion'),
+        ('advantage_disadvantage', 'Advantage-Disadvantage'),
+        ('random', 'Random')
+    ], default='random') 

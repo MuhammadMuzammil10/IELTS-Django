@@ -44,7 +44,13 @@ const Register = () => {
       <div className="max-w-md w-full space-y-8">
         <div>
           <div className="mx-auto h-12 w-12 bg-primary-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-xl">I</span>
+            <Link to="/" className="flex-shrink-0 flex items-center">
+            <img
+              src={require('../assets/gpt_logo_landscape.png')}
+              alt="IELTS Prep Logo"
+              className="w-22 h-14 rounded-lg"
+            />
+          </Link>
           </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Create your account

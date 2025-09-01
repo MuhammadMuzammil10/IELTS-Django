@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { FiBook, FiHeadphones, FiPlus, FiLoader } from 'react-icons/fi';
+import { FiBook, FiHeadphones, FiEdit3, FiPlus, FiLoader } from 'react-icons/fi';
 import axios from 'axios';
 const AdminDashboard = () => {
   const { user } = useAuth();
   const [generatingReading, setGeneratingReading] = useState(false);
   const [generatingListening, setGeneratingListening] = useState(false);
+  const [generatingWriting, setGeneratingWriting] = useState(false);
   const [message, setMessage] = useState('');
 
   const generateReadingTest = async () => {
@@ -41,6 +42,25 @@ const AdminDashboard = () => {
     }
   };
 
+  const generateWritingTest = async () => {
+    setGeneratingWriting(true);
+    setMessage('');
+    
+    try {
+      const response = await axios.post('/api/writing-tests/generate/', {
+        difficulty_level: 'medium',
+        task1_type: 'random',
+        task2_type: 'random'
+      });
+      const data = response.data;
+      setMessage(`Writing test generated successfully! Test ID: ${data.test_id}`);
+    } catch (error) {
+      setMessage(`Error generating writing test: ${error.response?.data?.error || error.message}`);
+    } finally {
+      setGeneratingWriting(false);
+    }
+  };
+
   if (!user?.is_staff) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -62,7 +82,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* Test Generation Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
           {/* Reading Test Generation */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex items-center mb-4">
@@ -120,6 +140,35 @@ const AdminDashboard = () => {
               )}
             </button>
           </div>
+
+          {/* Writing Test Generation */}
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="flex items-center mb-4">
+              <FiEdit3 className="text-2xl text-purple-600 mr-3" />
+              <h2 className="text-xl font-semibold text-gray-900">Writing Test Generator</h2>
+            </div>
+            <p className="text-gray-600 mb-6">
+              Generate new IELTS writing tests with Task 1 (graphs/charts) and Task 2 (essays). 
+              Includes AI-generated images and essay prompts.
+            </p>
+            <button
+              onClick={generateWritingTest}
+              disabled={generatingWriting}
+              className="w-full bg-purple-600 text-white py-3 px-4 rounded-md hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center"
+            >
+              {generatingWriting ? (
+                <>
+                  <FiLoader className="animate-spin mr-2" />
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <FiPlus className="mr-2" />
+                  Generate Writing Test
+                </>
+              )}
+            </button>
+          </div>
         </div>
 
         {/* Message Display */}
@@ -146,6 +195,7 @@ const AdminDashboard = () => {
               <ul className="text-gray-600 space-y-1">
                 <li>• Generate Reading Tests</li>
                 <li>• Generate Listening Tests</li>
+                <li>• Generate Writing Tests</li>
                 <li>• View Test Analytics</li>
                 <li>• Manage User Content</li>
               </ul>
@@ -156,7 +206,7 @@ const AdminDashboard = () => {
         {/* Test Generation Guidelines */}
         <div className="bg-blue-50 rounded-lg p-6 mt-8">
           <h3 className="text-lg font-semibold text-blue-900 mb-4">Test Generation Guidelines</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
               <h4 className="font-medium text-blue-800 mb-2">Reading Tests</h4>
               <ul className="text-blue-700 text-sm space-y-1">
@@ -173,6 +223,15 @@ const AdminDashboard = () => {
                 <li>• 30-minute duration</li>
                 <li>• AI-generated transcripts</li>
                 <li>• Audio integration support</li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-medium text-blue-800 mb-2">Writing Tests</h4>
+              <ul className="text-blue-700 text-sm space-y-1">
+                <li>• Task 1: Graphs, charts, tables, diagrams</li>
+                <li>• Task 2: Opinion, discussion, problem-solution</li>
+                <li>• AI-generated images and prompts</li>
+                <li>• Automated IELTS evaluation</li>
               </ul>
             </div>
           </div>
